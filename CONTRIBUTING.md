@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve `/Users/roger/Developer/my-opensource/plugtestkit`.
+Thanks for helping improve plugtestkit.
 
 This project values small, reviewable contributions with clear verification.
 
@@ -9,7 +9,7 @@ This project values small, reviewable contributions with clear verification.
 Before opening an issue:
 
 - Search existing issues.
-- Confirm the issue applies to `/Users/roger/Developer/my-opensource/plugtestkit`.
+- Confirm the issue applies to plugtestkit.
 - Include enough context for maintainers to understand or reproduce the request.
 
 Bug reports should include:
@@ -77,3 +77,11 @@ If verification cannot be run, explain why and provide the exact command maintai
 ## Maintainer Review
 
 Maintainers may request narrower scope, clearer verification, additional tests, or safer defaults before merging.
+
+## Fixture-first workflow
+
+Behavior changes should usually add or update a fixture in `fixtures/` and a Node test in `test/`. The CLI smoke script should continue to exercise a real fixture, not a mocked command.
+
+## Generated files
+
+When changing scaffold templates, keep generated output deterministic and document any new external setup requirement in `docs/TEMPLATES.md` or `docs/SAFETY.md`.
