@@ -2,57 +2,33 @@
 
 ## Supported Versions
 
-Replace this section with the supported versions for `/Users/roger/Developer/my-opensource/plugtestkit`.
+plugtestkit has not published a stable release yet.
 
-Example:
-
-```md
 | Version | Supported |
 | --- | --- |
-| .x | Yes |
-| < .0 | No |
-```
-
-If the project does not publish versioned releases yet, say that clearly.
+| 0.x | Best-effort security fixes before 1.0 |
 
 ## Reporting a Vulnerability
 
 Please do not report suspected vulnerabilities in public issues, pull requests, or discussions.
 
-Ask maintainers for the private security reporting path before sharing details.
-
-If no private reporting path exists yet, ask maintainers through public project channels for a private reporting path. Do not include exploit details, secrets, personal data, or sensitive technical details in public messages.
-
-## What to Include
-
-When a private reporting path is available, include:
-
-- A clear description of the issue.
-- Affected versions, files, packages, workflows, or configuration.
-- Steps to reproduce, proof of concept, or attack scenario when safe to share.
-- Potential impact.
-- Suggested mitigation, if known.
-
-## Response Expectations
-
-Maintainers review good-faith reports as capacity allows.
-
-Do not imply paid support, guaranteed response times, guaranteed fixes, or service-level agreements unless `/Users/roger/Developer/my-opensource/plugtestkit` explicitly provides them.
+Open a public issue asking for a private reporting path without including exploit details, secrets, personal data, or sensitive technical details. A maintainer will provide a suitable private channel when available.
 
 ## Scope
 
 In scope:
 
-- Vulnerabilities in /Users/roger/Developer/my-opensource/plugtestkit.
-- Insecure default configuration shipped by this project.
-- CI, release, or dependency guidance maintained by this project.
+- Bugs that cause plugtestkit to read outside an explicitly provided plugin directory.
+- Bugs that cause plugtestkit to write outside an explicit `--output` path.
+- Unsafe generated templates that encourage secret leakage or hidden network behavior.
+- CI or release configuration maintained in this repository.
 
 Out of scope:
 
-- General support requests.
-- Requests for guaranteed maintenance timelines.
-- Issues in unrelated downstream projects.
+- Security issues in downstream WordPress plugins.
+- General WordPress, PHPUnit, Composer, or PHPCS vulnerabilities not introduced by this project.
+- Requests for guaranteed support timelines.
 
-## Disclosure
+## Safety posture
 
-Coordinate disclosure with maintainers before publishing vulnerability details.
+plugtestkit should not perform network calls, telemetry, credential discovery, or package publishing. Treat regressions against that safety model as security-relevant.
