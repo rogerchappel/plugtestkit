@@ -1,38 +1,28 @@
 # Roadmap
 
 This roadmap describes intended direction, not a binding delivery promise.
-Review it regularly and update it as the project learns from users,
-contributors, and implementation constraints.
 
 ## Now
 
-- Define the smallest useful project scope.
-- Keep repository setup, documentation, and verification easy for contributors
-  to follow.
-- Ship small, reviewable improvements.
+- Keep the inspect and scaffold commands deterministic and local-first.
+- Expand fixture coverage for common plugin header shapes.
+- Improve generated bootstrap comments and failure messages.
 
 ## Next
 
-- Add the next capabilities that directly support the project's primary users.
-- Improve tests, docs, and examples around the most used workflows.
-- Reduce setup friction discovered during early use.
+- Add optional template profiles for GitHub Actions, GitLab CI, and local-only Composer workflows.
+- Detect common plugin file layouts more gracefully.
+- Add snapshot tests for generated scaffold output.
+- Support maintainer-provided matrix config files.
 
 ## Later
 
-- Consider larger features after the core workflow is stable.
-- Add automation only where it removes repeated maintainer work.
-- Revisit packaging, deployment, or integration options based on real demand.
+- Consider opt-in WordPress.org metadata enrichment if users ask for it.
+- Consider a TUI wizard after the CLI/API workflow is stable.
+- Consider package-manager-specific recipes for Composer, wp-env, and Docker.
 
 ## Not Planned
 
-- Unrelated platform rewrites without a clear migration path.
-- Mandatory dependencies on a single ecosystem unless the project requires it.
-- Public release dates before maintainers are ready to commit to them.
-
-## Roadmap Review
-
-Before each major or meaningful minor release:
-
-- Move completed user-visible work into `CHANGELOG.md`.
-- Remove stale commitments.
-- Promote only the next reviewable set of work into `Now`.
+- Hidden network calls or telemetry.
+- Automatic publishing to npm, Packagist, WordPress.org, or GitHub Releases.
+- Replacing WordPress core test tooling.
