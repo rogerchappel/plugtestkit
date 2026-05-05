@@ -8,11 +8,12 @@ for await (const file of walk(root)) {
   if (file.includes(`${path.sep}.git${path.sep}`) || file.includes(`${path.sep}node_modules${path.sep}`)) continue;
   if (!/\.(js|md|json|yml|yaml|sh)$/.test(file)) continue;
   const content = await readFile(file, 'utf8');
-  if (content.includes('/Users/roger/Developer/my-opensource/plugtestkit') && !file.endsWith('AGENTS.md') && !file.endsWith('docs/orchestration.json')) {
-    failures.push(`placeholder absolute path leaked into ${path.relative(root, file)}`);
+  const rel = path.relative(root, file);
+  if (content.includes('/Users/roger/Developer/my-opensource/plugtestkit') && !['AGENTS.md', 'docs/orchestration.json', 'scripts/check.js', 'scripts/validate.sh'].includes(rel)) {
+    failures.push(`placeholder absolute path leaked into ${rel}`);
   }
-  if (/\s$/m.test(content)) {
-    failures.push(`trailing whitespace in ${path.relative(root, file)}`);
+  if (content.split(/\r?\n/).some((line) => /[ \t]+$/.test(line))) {
+    failures.push(`trailing whitespace in ${rel}`);
   }
 }
 
