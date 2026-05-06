@@ -4,6 +4,8 @@ Local-first WordPress plugin test harness generator with PHPUnit, PHPCS, and CI 
 
 plugtestkit helps a maintainer or coding agent inspect a plugin fixture, validate a practical PHP/WordPress matrix, and generate a starter test harness without network calls or publishing side effects.
 
+The personality is intentionally calm and slightly stubborn: inspect first, generate deterministic files, leave dependency installs and external systems to the human. It is scaffolding with receipts, not magic.
+
 ## Status
 
 Early MVP. The generated files are intended as reviewable starting points, not a complete WordPress integration environment.
@@ -45,6 +47,17 @@ Dry-run the scaffold plan:
 
 ```sh
 plugtestkit scaffold fixtures/sample-plugin --dry-run
+```
+
+Use the JavaScript API in a local automation script:
+
+```js
+import { inspectPlugin, planScaffold } from 'plugtestkit';
+
+const inspection = await inspectPlugin('fixtures/sample-plugin');
+const plan = await planScaffold('fixtures/sample-plugin');
+
+console.log(inspection.ok, plan.files.map((file) => file.path));
 ```
 
 ## What it generates
