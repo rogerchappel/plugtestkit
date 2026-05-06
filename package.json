@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "description": "Local-first WordPress plugin test harness generator with PHPUnit, PHPCS, and CI templates.",
   "type": "module",
+  "homepage": "https://github.com/rogerchappel/plugtestkit#readme",
+  "bugs": {
+    "url": "https://github.com/rogerchappel/plugtestkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/plugtestkit.git"
+  },
   "bin": {
     "plugtestkit": "./bin/plugtestkit.js"
   },
@@ -33,7 +41,9 @@
     "testing",
     "ci",
     "scaffold",
-    "local-first"
+    "local-first",
+    "wordpress-plugin",
+    "agentic-workflows"
   ],
   "author": "Roger Chappel",
   "license": "MIT",
