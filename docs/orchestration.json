@@ -1,7 +1,7 @@
 {
   "project": "plugtestkit",
   "owner": "single-subagent",
-  "repoRoot": "/Users/roger/Developer/my-opensource/plugtestkit",
+  "repoRoot": "/Users/roger/Developer/my-opensource/plugtestkit-worktrees/factory-20260507-0630",
   "github": "rogerchappel/plugtestkit",
   "branch": "main",
   "qualityBar": [
@@ -11,5 +11,12 @@
     "README with examples and safety notes",
     "public GitHub repo",
     "branch protection attempted"
-  ]
+  ],
+  "commands": {
+    "test": "npm test",
+    "check": "npm run check",
+    "build": "npm run build",
+    "smoke": "npm run smoke",
+    "releaseCheck": "npm run release:check"
+  }
 }
