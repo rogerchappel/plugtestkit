@@ -14,6 +14,7 @@ export async function runCli(argv, streams = {}) {
 
   try {
     if (args.command === 'inspect') return await inspectCommand(args, stdout);
+    if (args.command === 'matrix') return await matrixCommand(args, stdout);
     if (args.command === 'scaffold') return await scaffoldCommand(args, stdout);
     stderr.write(`Unknown command: ${args.command}\n\n${helpText()}`);
     return 2;
@@ -37,6 +38,21 @@ async function inspectCommand(args, stdout) {
   return result.ok ? 0 : 1;
 }
 
+async function matrixCommand(args, stdout) {
+  const pluginDir = args.positionals[0];
+  if (!pluginDir) throw new Error('matrix requires a plugin directory.');
+  const result = await inspectPlugin(pluginDir);
+  const payload = {
+    ok: result.ok,
+    plugin: result.metadata.name,
+    php: result.matrix.php,
+    wordpress: result.matrix.wordpress,
+    findings: result.findings.filter((finding) => finding.code === 'MATRIX_WARNING' || finding.code === 'MATRIX_ERROR')
+  };
+  stdout.write(args.json ? `${JSON.stringify(payload, null, 2)}\n` : renderMatrixText(payload));
+  return result.ok ? 0 : 1;
+}
+
 async function scaffoldCommand(args, stdout) {
   const pluginDir = args.positionals[0];
   if (!pluginDir) throw new Error('scaffold requires a plugin directory.');
@@ -48,6 +64,22 @@ async function scaffoldCommand(args, stdout) {
   const result = await writeScaffold(pluginDir, args.output, { force: args.force });
   stdout.write(`Wrote ${result.written.length} scaffold files to ${args.output}\n`);
   return result.inspection.ok ? 0 : 1;
+}
+
+export function renderMatrixText(payload) {
+  const lines = [
+    `plugtestkit matrix: ${payload.plugin}`,
+    `status: ${payload.ok ? 'ok' : 'needs attention'}`,
+    `php: ${payload.php.join(', ') || 'none'}`,
+    `wordpress: ${payload.wordpress.join(', ') || 'none'}`
+  ];
+  if (payload.findings.length > 0) {
+    lines.push('findings:');
+    for (const finding of payload.findings) {
+      lines.push(`  - [${finding.level}] ${finding.message}`);
+    }
+  }
+  return `${lines.join('\n')}\n`;
 }
 
 export function parseArgs(argv) {
@@ -79,11 +111,13 @@ export function helpText() {
 
 Usage:
   plugtestkit inspect <plugin-dir> [--json] [--output <file>]
+  plugtestkit matrix <plugin-dir> [--json]
   plugtestkit scaffold <plugin-dir> --output <dir> [--force]
   plugtestkit scaffold <plugin-dir> --dry-run
 
 Commands:
   inspect    Parse plugin headers, validate PHP/WordPress matrix, and report findings.
+  matrix     Print the PHP and WordPress test matrix only.
   scaffold   Generate composer, PHPUnit, PHPCS, and GitHub Actions test harness files.
 
 Safety:
