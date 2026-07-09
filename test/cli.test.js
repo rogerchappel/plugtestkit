@@ -22,6 +22,15 @@ test('runs help command', async () => {
   assert.match(output.text(), /plugtestkit/);
 });
 
+test('runs matrix command as focused JSON', async () => {
+  const output = captureStream();
+  const code = await runCli(['matrix', 'fixtures/sample-plugin', '--json'], { stdout: output.stream, stderr: captureStream().stream });
+  const payload = JSON.parse(output.text());
+  assert.equal(code, 0);
+  assert.equal(payload.plugin, 'Sample Fixture Plugin');
+  assert.deepEqual(payload.php, ['8.1', '8.2', '8.3']);
+});
+
 function captureStream() {
   const chunks = [];
   return {

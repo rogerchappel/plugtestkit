@@ -37,6 +37,12 @@ Write JSON for an agent or CI step:
 plugtestkit inspect fixtures/sample-plugin --json --output out/report.json
 ```
 
+Focus only on the PHP/WordPress test matrix:
+
+```sh
+plugtestkit matrix fixtures/sample-plugin --json
+```
+
 Generate a harness into an explicit directory:
 
 ```sh

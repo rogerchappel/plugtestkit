@@ -9,6 +9,7 @@
 - Implement the CLI commands promised by the PRD.
 - Keep all network/publish behavior explicit, opt-in, and dry-run first.
 - Emit useful JSON and human-readable reports.
+- Add focused matrix output for CI generators and agent planners.
 
 ## Wave 3 — tests and smokes
 - Add unit tests for parsers, planners, validators, and report output.
