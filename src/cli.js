@@ -1,12 +1,20 @@
 import { inspectPlugin, planScaffold, writeScaffold } from './index.js';
 import { renderJsonReport, renderTextReport } from './report.js';
 import { writeReport } from './output.js';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const { version } = require('../package.json');
 
 export async function runCli(argv, streams = {}) {
   const stdout = streams.stdout ?? process.stdout;
   const stderr = streams.stderr ?? process.stderr;
   const args = parseArgs(argv);
 
+  if (args.version) {
+    stdout.write(`${version}\n`);
+    return 0;
+  }
   if (args.help || args.command === 'help' || !args.command) {
     stdout.write(helpText());
     return 0;
@@ -83,7 +91,7 @@ export function renderMatrixText(payload) {
 }
 
 export function parseArgs(argv) {
-  const parsed = { command: null, positionals: [], help: false, json: false, dryRun: false, force: false, output: null };
+  const parsed = { command: null, positionals: [], help: false, version: false, json: false, dryRun: false, force: false, output: null };
   const queue = [...argv];
   while (queue.length) {
     const token = queue.shift();
@@ -91,6 +99,8 @@ export function parseArgs(argv) {
       parsed.command = token;
     } else if (token === '--help' || token === '-h') {
       parsed.help = true;
+    } else if (token === '--version' || token === '-v') {
+      parsed.version = true;
     } else if (token === '--json') {
       parsed.json = true;
     } else if (token === '--dry-run') {
@@ -110,6 +120,7 @@ export function helpText() {
   return `plugtestkit - local-first WordPress plugin test harness generator
 
 Usage:
+  plugtestkit --version
   plugtestkit inspect <plugin-dir> [--json] [--output <file>]
   plugtestkit matrix <plugin-dir> [--json]
   plugtestkit scaffold <plugin-dir> --output <dir> [--force]
