@@ -21,6 +21,7 @@ For local development from this repository:
 ```sh
 npm install
 node bin/plugtestkit.js --help
+node bin/plugtestkit.js --version
 ```
 
 ## Quickstart

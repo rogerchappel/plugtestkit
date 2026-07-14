@@ -8,6 +8,7 @@ test('parses inspect options', () => {
     command: 'inspect',
     positionals: ['fixtures/sample-plugin'],
     help: false,
+    version: false,
     json: true,
     dryRun: false,
     force: false,
@@ -20,6 +21,13 @@ test('runs help command', async () => {
   const code = await runCli(['--help'], { stdout: output.stream, stderr: captureStream().stream });
   assert.equal(code, 0);
   assert.match(output.text(), /plugtestkit/);
+});
+
+test('runs version command', async () => {
+  const output = captureStream();
+  const code = await runCli(['--version'], { stdout: output.stream, stderr: captureStream().stream });
+  assert.equal(code, 0);
+  assert.match(output.text(), /^0\.1\.0\n$/);
 });
 
 test('runs matrix command as focused JSON', async () => {
