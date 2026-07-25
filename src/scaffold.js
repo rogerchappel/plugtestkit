@@ -9,7 +9,10 @@ export async function planScaffold(pluginDir, options = {}) {
     { path: 'composer.json', content: composerJson(inspection.metadata) },
     { path: 'phpunit.xml.dist', content: phpunitXml(inspection.metadata) },
     { path: 'phpcs.xml.dist', content: phpcsXml(inspection.metadata) },
-    { path: 'tests/bootstrap.php', content: bootstrapPhp(inspection.metadata) },
+    { path: 'tests/bootstrap.php', content: bootstrapPhp(
+      inspection.metadata,
+      inspection.mainFile ? path.basename(inspection.mainFile) : `${inspection.metadata.textDomain}.php`
+    ) },
     { path: 'tests/PluginSmokeTest.php', content: exampleTestPhp(inspection.metadata) },
     { path: '.github/workflows/plugin-tests.yml', content: githubActionsCi(inspection.matrix) }
   ];
