@@ -12,6 +12,12 @@ test('filters matrix by minimum PHP and WordPress versions', () => {
   assert.deepEqual(result.errors, []);
 });
 
+test('default matrix includes the current WordPress boundary', () => {
+  const result = validateMatrix({ requiresPhp: '8.1', requiresWp: '6.8' });
+  assert.deepEqual(result.wordpress, ['6.8', '6.9', '7.0']);
+  assert.deepEqual(result.errors, []);
+});
+
 test('reports impossible minimum versions', () => {
   const result = validateMatrix(
     { requiresPhp: '9.0', requiresWp: '7.0' },

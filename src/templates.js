@@ -43,8 +43,7 @@ export function phpcsXml(metadata) {
 `;
 }
 
-export function bootstrapPhp(metadata) {
-  const slug = slugify(metadata.textDomain ?? metadata.name);
+export function bootstrapPhp(metadata, mainFile) {
   return `<?php
 /**
  * PHPUnit bootstrap for ${metadata.name}.
@@ -61,7 +60,7 @@ if (! file_exists($_tests_dir . '/includes/functions.php')) {
 require_once $_tests_dir . '/includes/functions.php';
 
 tests_add_filter('muplugins_loaded', function (): void {
-    require dirname(__DIR__) . '/${slug}.php';
+    require dirname(__DIR__) . '/${escapePhpSingleQuoted(mainFile)}';
 });
 
 require $_tests_dir . '/includes/bootstrap.php';
@@ -89,6 +88,19 @@ on:
 jobs:
   phpunit:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306/tcp
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     strategy:
       fail-fast: false
       matrix:
@@ -101,6 +113,15 @@ jobs:
           php-version: \${{ matrix.php }}
           tools: composer
       - run: composer install
+      - name: Install WordPress test suite
+        env:
+          WP_VERSION: \${{ matrix.wordpress }}
+          DB_PORT: \${{ job.services.mysql.ports[3306] }}
+        run: |
+          curl --fail --silent --show-error --location \
+            --output /tmp/install-wp-tests.sh \
+            https://raw.githubusercontent.com/wp-cli/scaffold-command/main/templates/install-wp-tests.sh
+          bash /tmp/install-wp-tests.sh wordpress_test root '' "127.0.0.1:\${DB_PORT}" "\${WP_VERSION}"
       - run: composer test
 `;
 }
@@ -111,4 +132,8 @@ function className(name) {
 
 function escapeXml(value) {
   return String(value).replace(/[<>&'"]/g, (char) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '\'': '&apos;', '"': '&quot;' }[char]));
+}
+
+function escapePhpSingleQuoted(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
