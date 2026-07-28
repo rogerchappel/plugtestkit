@@ -13,8 +13,12 @@ Early MVP. The generated files are intended as reviewable starting points, not a
 ## Install
 
 ```sh
-npm install -g plugtestkit
+npm install -g https://github.com/rogerchappel/plugtestkit/releases/download/v0.1.0/plugtestkit-0.1.0.tgz
 ```
+
+The package is distributed as a versioned npm-compatible tarball on the
+[GitHub releases page](https://github.com/rogerchappel/plugtestkit/releases).
+It is not currently published to the public npm registry.
 
 For local development from this repository:
 
@@ -134,7 +138,9 @@ npm run package:smoke
 npm run release:check
 ```
 
-The package smoke uses `npm pack --dry-run` so the published file list can be reviewed without publishing.
+The package smoke creates the npm tarball without publishing, verifies its
+package identity and required files, installs it into a temporary directory,
+and runs the installed CLI's `--help` and `--version` commands.
 
 ## Development
 
