@@ -39,6 +39,18 @@ test('runs matrix command as focused JSON', async () => {
   assert.deepEqual(payload.php, ['8.1', '8.2', '8.3', '8.4']);
 });
 
+test('inspect accepts a case-insensitive Plugin Name header', async () => {
+  const output = captureStream();
+  const code = await runCli(['inspect', 'fixtures/mixed-case-header-plugin', '--json'], {
+    stdout: output.stream,
+    stderr: captureStream().stream
+  });
+  const payload = JSON.parse(output.text());
+  assert.equal(code, 0);
+  assert.equal(payload.metadata.name, 'Mixed Case Header Plugin');
+  assert.equal(payload.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), false);
+});
+
 function captureStream() {
   const chunks = [];
   return {
