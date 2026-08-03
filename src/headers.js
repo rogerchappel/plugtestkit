@@ -16,12 +16,18 @@ export function parsePluginHeaders(source) {
   const lines = String(source).split(/\r?\n/).slice(0, 80);
 
   for (const [key, label] of Object.entries(PLUGIN_HEADER_FIELDS)) {
-    const pattern = new RegExp(`^[\\s/*#@]*${escapeRegExp(label)}\\s*:\\s*(.+?)\\s*$`, 'i');
+    const pattern = pluginHeaderPattern(label);
     const line = lines.find((candidate) => pattern.test(candidate));
     headers[key] = line ? line.match(pattern)[1].replace(/\*\/$/, '').trim() : null;
   }
 
   return headers;
+}
+
+export function hasPluginNameHeader(source) {
+  const lines = String(source).split(/\r?\n/).slice(0, 80);
+  const pattern = pluginHeaderPattern(PLUGIN_HEADER_FIELDS.name);
+  return lines.some((line) => pattern.test(line));
 }
 
 export function parseReadmeMetadata(source) {
@@ -44,4 +50,8 @@ export function parseReadmeMetadata(source) {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function pluginHeaderPattern(label) {
+  return new RegExp(`^[\\s/*#@]*${escapeRegExp(label)}\\s*:\\s*(.+?)\\s*$`, 'i');
 }
