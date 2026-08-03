@@ -1,8 +1,7 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { PlugtestkitError } from './errors.js';
-
-const HEADER_HINTS = ['Plugin Name', 'Requires PHP', 'Requires at least', 'Text Domain'];
+import { hasPluginNameHeader } from './headers.js';
 
 export async function findPluginFiles(pluginDir) {
   let entries;
@@ -22,7 +21,7 @@ export async function findPluginFiles(pluginDir) {
   const mainFiles = [];
   for (const file of phpFiles) {
     const content = await readFile(file, 'utf8');
-    if (HEADER_HINTS.some((hint) => content.includes(`${hint}:`))) {
+    if (hasPluginNameHeader(content)) {
       mainFiles.push(file);
     }
   }
