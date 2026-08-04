@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Writable } from 'node:stream';
+import { access, mkdtemp } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import { parseArgs, runCli } from '../src/cli.js';
 
 test('parses inspect options', () => {
@@ -49,6 +52,39 @@ test('inspect accepts a case-insensitive Plugin Name header', async () => {
   assert.equal(code, 0);
   assert.equal(payload.metadata.name, 'Mixed Case Header Plugin');
   assert.equal(payload.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), false);
+});
+
+test('scaffold reports inspection errors without partial writes', async () => {
+  const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-cli-'));
+  const outputDir = path.join(scratch, 'output');
+  const output = captureStream();
+  const errors = captureStream();
+  const code = await runCli(['scaffold', 'fixtures/missing-plugin', '--output', outputDir], {
+    stdout: output.stream,
+    stderr: errors.stream
+  });
+
+  assert.equal(code, 1);
+  assert.equal(output.text(), '');
+  assert.match(errors.text(), /ScaffoldInspectionError: Cannot write scaffold because plugin inspection failed/);
+  assert.match(errors.text(), /NO_PLUGIN_HEADER: No PHP file with a WordPress plugin header was found/);
+  await assert.rejects(access(outputDir), { code: 'ENOENT' });
+});
+
+test('scaffold dry-run exposes findings and remains side-effect-free', async () => {
+  const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-cli-'));
+  const outputDir = path.join(scratch, 'output');
+  const output = captureStream();
+  const code = await runCli(['scaffold', 'fixtures/missing-plugin', '--dry-run', '--output', outputDir], {
+    stdout: output.stream,
+    stderr: captureStream().stream
+  });
+  const payload = JSON.parse(output.text());
+
+  assert.equal(code, 1);
+  assert.equal(payload.ok, false);
+  assert.equal(payload.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), true);
+  await assert.rejects(access(outputDir), { code: 'ENOENT' });
 });
 
 function captureStream() {

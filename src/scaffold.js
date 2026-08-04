@@ -22,6 +22,9 @@ export async function planScaffold(pluginDir, options = {}) {
 
 export async function writeScaffold(pluginDir, outputDir, options = {}) {
   const plan = await planScaffold(pluginDir, options);
+  if (!plan.inspection.ok) {
+    throw new ScaffoldInspectionError(plan.inspection.findings);
+  }
   const absoluteOutput = path.resolve(options.cwd ?? process.cwd(), outputDir);
   const written = [];
 
@@ -33,4 +36,14 @@ export async function writeScaffold(pluginDir, outputDir, options = {}) {
   }
 
   return { ...plan, outputDir: absoluteOutput, written };
+}
+
+export class ScaffoldInspectionError extends Error {
+  constructor(findings) {
+    const errors = findings.filter((finding) => finding.level === 'error');
+    const details = errors.map((finding) => `${finding.code}: ${finding.message}`).join('\n');
+    super(`Cannot write scaffold because plugin inspection failed:\n${details}`);
+    this.name = 'ScaffoldInspectionError';
+    this.findings = errors;
+  }
 }

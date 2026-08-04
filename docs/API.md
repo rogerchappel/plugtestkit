@@ -16,7 +16,8 @@ console.log(plan.files.map((file) => file.path));
 
 - `inspectPlugin(pluginDir, options)` — returns metadata, matrix, and findings.
 - `planScaffold(pluginDir, options)` — returns generated file contents without writing them.
-- `writeScaffold(pluginDir, outputDir, options)` — writes scaffold files to an explicit output directory.
+- `writeScaffold(pluginDir, outputDir, options)` — writes scaffold files to an explicit output directory; throws `ScaffoldInspectionError` before creating it when inspection has error findings.
+- `ScaffoldInspectionError` — exposes the blocking inspection findings on its `findings` property.
 - `renderTextReport(result)` — formats a readable inspection report.
 - `renderJsonReport(result)` — formats stable JSON output.
 - `validateMatrix(metadata, options)` — filters PHP and WordPress versions by plugin requirements.
