@@ -21,9 +21,13 @@ Options:
 
 Generates a test harness into an explicit output directory.
 
+The command inspects the plugin before creating the output directory. Error
+findings such as a missing plugin header or invalid test matrix are printed to
+standard error, and no scaffold files are written.
+
 Options:
 
-- `--dry-run` — print the file plan without writing files.
+- `--dry-run` — print the file plan and inspection findings without writing files.
 - `--force` — overwrite existing files in the output directory.
 
 ## Exit codes
