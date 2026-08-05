@@ -19,6 +19,31 @@ test('parses inspect options', () => {
   });
 });
 
+test('preserves documented option ordering', () => {
+  assert.deepEqual(parseArgs(['--json', 'inspect', '--output', 'out.json', 'fixtures/sample-plugin']).positionals, ['fixtures/sample-plugin']);
+});
+
+for (const [name, argv, message] of [
+  ['unknown flags', ['inspect', 'fixtures/sample-plugin', '--bogus'], /Unknown option: --bogus/],
+  ['missing option values', ['inspect', 'fixtures/sample-plugin', '--output'], /--output requires a value/],
+  ['option-like missing values', ['inspect', 'fixtures/sample-plugin', '--output', '--json'], /--output requires a value/],
+  ['unsupported inspect options', ['inspect', 'fixtures/sample-plugin', '--force'], /--force is not supported by inspect/],
+  ['unsupported matrix options', ['matrix', 'fixtures/sample-plugin', '--output', 'report.json'], /--output is not supported by matrix/],
+  ['duplicate singleton options', ['matrix', 'fixtures/sample-plugin', '--json', '--json'], /Option may only be specified once: --json/],
+  ['missing positionals', ['inspect', '--json'], /inspect requires a plugin directory/],
+  ['surplus positionals', ['scaffold', 'fixtures/sample-plugin', 'extra', '--dry-run'], /scaffold accepts exactly one plugin directory/],
+  ['missing scaffold mode', ['scaffold', 'fixtures/sample-plugin'], /scaffold requires --output <dir> or --dry-run/]
+]) {
+  test(`rejects ${name} with usage exit status`, async () => {
+    const output = captureStream();
+    const errors = captureStream();
+    const code = await runCli(argv, { stdout: output.stream, stderr: errors.stream });
+    assert.equal(code, 2);
+    assert.equal(output.text(), '');
+    assert.match(errors.text(), message);
+  });
+}
+
 test('runs help command', async () => {
   const output = captureStream();
   const code = await runCli(['--help'], { stdout: output.stream, stderr: captureStream().stream });
