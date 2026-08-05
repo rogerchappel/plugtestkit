@@ -30,8 +30,12 @@ Options:
 - `--dry-run` — print the file plan and inspection findings without writing files.
 - `--force` — overwrite existing files in the output directory.
 
+Options may appear before or after the command and plugin directory. Unknown,
+duplicate, or command-incompatible options are rejected, as are missing option
+values and extra positional arguments.
+
 ## Exit codes
 
 - `0` — command completed and inspection had no error findings.
 - `1` — command failed or inspection had error findings.
-- `2` — invalid command.
+- `2` — invalid command or command-line usage.
