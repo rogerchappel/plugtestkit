@@ -9,7 +9,14 @@ const { version } = require('../package.json');
 export async function runCli(argv, streams = {}) {
   const stdout = streams.stdout ?? process.stdout;
   const stderr = streams.stderr ?? process.stderr;
-  const args = parseArgs(argv);
+  let args;
+
+  try {
+    args = parseArgs(argv);
+  } catch (error) {
+    stderr.write(`${error.message}\n`);
+    return 2;
+  }
 
   if (args.version) {
     stdout.write(`${version}\n`);
@@ -92,28 +99,78 @@ export function renderMatrixText(payload) {
 
 export function parseArgs(argv) {
   const parsed = { command: null, positionals: [], help: false, version: false, json: false, dryRun: false, force: false, output: null };
+  const seen = new Set();
   const queue = [...argv];
   while (queue.length) {
     const token = queue.shift();
     if (!parsed.command && !token.startsWith('-')) {
       parsed.command = token;
     } else if (token === '--help' || token === '-h') {
+      assertSingleton(seen, 'help', token);
       parsed.help = true;
     } else if (token === '--version' || token === '-v') {
+      assertSingleton(seen, 'version', token);
       parsed.version = true;
     } else if (token === '--json') {
+      assertSingleton(seen, 'json', token);
       parsed.json = true;
     } else if (token === '--dry-run') {
+      assertSingleton(seen, 'dryRun', token);
       parsed.dryRun = true;
     } else if (token === '--force') {
+      assertSingleton(seen, 'force', token);
       parsed.force = true;
     } else if (token === '--output' || token === '-o') {
-      parsed.output = queue.shift();
+      assertSingleton(seen, 'output', token);
+      const value = queue.shift();
+      if (!value || value.startsWith('-')) throw new Error(`${token} requires a value.`);
+      parsed.output = value;
+    } else if (token.startsWith('-')) {
+      throw new Error(`Unknown option: ${token}`);
     } else {
       parsed.positionals.push(token);
     }
   }
+  validateArgs(parsed);
   return parsed;
+}
+
+function assertSingleton(seen, name, token) {
+  if (seen.has(name)) throw new Error(`Option may only be specified once: ${token}`);
+  seen.add(name);
+}
+
+function validateArgs(args) {
+  if (args.version) {
+    if (args.command || args.positionals.length || args.help || args.json || args.dryRun || args.force || args.output) {
+      throw new Error('--version cannot be combined with commands or other options.');
+    }
+    return;
+  }
+
+  if (!args.command) {
+    if (args.positionals.length || args.json || args.dryRun || args.force || args.output) throw new Error('A command is required.');
+    return;
+  }
+
+  if (args.command === 'help') {
+    if (args.positionals.length || args.json || args.dryRun || args.force || args.output) throw new Error('help does not accept arguments or options.');
+    return;
+  }
+
+  const allowed = {
+    inspect: ['json', 'output'],
+    matrix: ['json'],
+    scaffold: ['dryRun', 'force', 'output']
+  }[args.command];
+  if (!allowed) return;
+
+  for (const [name, label] of [['json', '--json'], ['dryRun', '--dry-run'], ['force', '--force'], ['output', '--output']]) {
+    if (args[name] && !allowed.includes(name)) throw new Error(`${label} is not supported by ${args.command}.`);
+  }
+  if (args.positionals.length === 0) throw new Error(`${args.command} requires a plugin directory.`);
+  if (args.positionals.length > 1) throw new Error(`${args.command} accepts exactly one plugin directory.`);
+  if (args.command === 'scaffold' && !args.dryRun && !args.output) throw new Error('scaffold requires --output <dir> or --dry-run.');
 }
 
 export function helpText() {
