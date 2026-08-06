@@ -67,3 +67,30 @@ test('does not create output when inspection finds an invalid matrix', async () 
   await assert.rejects(access(output), { code: 'ENOENT' });
   assert.match(await readFile(path.join(plugin, 'plugin.php'), 'utf8'), /Requires PHP: next/);
 });
+
+test('does not partially write a scaffold when a later target already exists', async () => {
+  const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-scaffold-'));
+  const output = path.join(scratch, 'output');
+  const collision = path.join(output, '.github/workflows/plugin-tests.yml');
+  const unrelated = path.join(output, 'notes/existing.bin');
+  const collisionContent = Buffer.from([0x00, 0xff, 0x50, 0x54, 0x4b]);
+  const unrelatedContent = Buffer.from([0xde, 0xad, 0xbe, 0xef]);
+  await mkdir(path.dirname(collision), { recursive: true });
+  await mkdir(path.dirname(unrelated), { recursive: true });
+  await writeFile(collision, collisionContent);
+  await writeFile(unrelated, unrelatedContent);
+
+  await assert.rejects(writeScaffold('fixtures/sample-plugin', output), { code: 'EEXIST' });
+
+  assert.deepEqual(await readFile(collision), collisionContent);
+  assert.deepEqual(await readFile(unrelated), unrelatedContent);
+  for (const target of [
+    'composer.json',
+    'phpunit.xml.dist',
+    'phpcs.xml.dist',
+    'tests/bootstrap.php',
+    'tests/PluginSmokeTest.php'
+  ]) {
+    await assert.rejects(access(path.join(output, target)), { code: 'ENOENT' });
+  }
+});
