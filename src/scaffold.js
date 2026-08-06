@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { inspectPlugin } from './inspect.js';
 import { bootstrapPhp, composerJson, exampleTestPhp, githubActionsCi, phpcsXml, phpunitXml } from './templates.js';
@@ -28,11 +28,35 @@ export async function writeScaffold(pluginDir, outputDir, options = {}) {
   const absoluteOutput = path.resolve(options.cwd ?? process.cwd(), outputDir);
   const written = [];
 
-  for (const file of plan.files) {
-    const target = path.join(absoluteOutput, file.path);
-    await mkdir(path.dirname(target), { recursive: true });
-    await writeFile(target, file.content, options.force ? undefined : { flag: 'wx' });
-    written.push(target);
+  if (!options.force) {
+    for (const file of plan.files) {
+      const target = path.join(absoluteOutput, file.path);
+      try {
+        await lstat(target);
+      } catch (error) {
+        if (error.code === 'ENOENT') continue;
+        throw error;
+      }
+
+      const error = new Error(`Scaffold target already exists: ${target}`);
+      error.code = 'EEXIST';
+      error.path = target;
+      throw error;
+    }
+  }
+
+  try {
+    for (const file of plan.files) {
+      const target = path.join(absoluteOutput, file.path);
+      await mkdir(path.dirname(target), { recursive: true });
+      await writeFile(target, file.content, options.force ? undefined : { flag: 'wx' });
+      written.push(target);
+    }
+  } catch (error) {
+    if (!options.force) {
+      await Promise.all(written.map((target) => unlink(target)));
+    }
+    throw error;
   }
 
   return { ...plan, outputDir: absoluteOutput, written };
