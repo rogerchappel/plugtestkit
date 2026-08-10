@@ -18,6 +18,12 @@ test('default matrix includes the current WordPress boundary', () => {
   assert.deepEqual(result.errors, []);
 });
 
+test('default matrix supports plugins requiring PHP 8.5', () => {
+  const result = validateMatrix({ requiresPhp: '8.5', requiresWp: '7.0' });
+  assert.deepEqual(result.php, ['8.5']);
+  assert.deepEqual(result.errors, []);
+});
+
 test('reports impossible minimum versions', () => {
   const result = validateMatrix(
     { requiresPhp: '9.0', requiresWp: '7.0' },
