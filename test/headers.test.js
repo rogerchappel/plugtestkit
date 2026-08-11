@@ -18,6 +18,28 @@ test('parses WordPress plugin headers from PHP comments', () => {
   assert.equal(headers.textDomain, 'example-plugin');
 });
 
+test('accepts supported comment styles and case-insensitive header labels', () => {
+  assert.equal(parsePluginHeaders('<?php // plugin name: Slash Comment').name, 'Slash Comment');
+  assert.equal(parsePluginHeaders('<?php\n# Plugin Name: Hash Comment').name, 'Hash Comment');
+  assert.equal(parsePluginHeaders('<?php /* Plugin Name: Block Comment */').name, 'Block Comment');
+});
+
+test('ignores header lookalikes outside PHP comments', () => {
+  const headers = parsePluginHeaders(`<?php
+$nowdoc = <<<'PLUGIN'
+Plugin Name: Nowdoc Lookalike
+# Version: 9.9.9
+PLUGIN;
+$heredoc = <<<PLUGIN
+// Plugin Name: Heredoc Lookalike
+PLUGIN;
+Plugin Name: Executable Lookalike
+echo 'Plugin Name: String Lookalike';`);
+
+  assert.equal(headers.name, null);
+  assert.equal(headers.version, null);
+});
+
 test('parses readme metadata fields', () => {
   const metadata = parseReadmeMetadata('Requires at least: 6.5\nTested up to: 6.7\nRequires PHP: 8.2\nStable tag: 1.0.0');
   assert.deepEqual(metadata, {
