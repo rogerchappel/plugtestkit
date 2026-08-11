@@ -48,6 +48,18 @@ Focus only on the PHP/WordPress test matrix:
 plugtestkit matrix fixtures/sample-plugin --json
 ```
 
+### Default compatibility policy
+
+The generated matrix includes PHP 8.1 through 8.5: every branch currently in
+[PHP active or security support](https://www.php.net/supported-versions.php).
+When PHP publishes a minor release or changes a branch's support status, these
+defaults and their generated-workflow tests should be reviewed together.
+Plugin `Requires PHP` metadata filters out older entries, so a plugin requiring
+PHP 8.5 receives a non-empty matrix containing PHP 8.5.
+
+The WordPress defaults retain the current and previous four minor releases and
+are reviewed when a new WordPress minor is published.
+
 Generate a harness into an explicit directory:
 
 ```sh

@@ -21,11 +21,28 @@ test('plans expected scaffold files', async () => {
 test('scaffold includes matrix in GitHub Actions template', async () => {
   const plan = await planScaffold('fixtures/sample-plugin');
   const ci = plan.files.find((file) => file.path.endsWith('plugin-tests.yml')).content;
-  assert.match(ci, /php: \['8\.1', '8\.2', '8\.3', '8\.4'\]/);
+  assert.match(ci, /php: \['8\.1', '8\.2', '8\.3', '8\.4', '8\.5'\]/);
   assert.match(ci, /wordpress: \['6\.6', '6\.7', '6\.8', '6\.9', '7\.0'\]/);
   assert.match(ci, /php-version: \$\{\{ matrix\.php \}\}/);
   assert.match(ci, /WP_VERSION: \$\{\{ matrix\.wordpress \}\}/);
   assert.match(ci, /install-wp-tests\.sh/);
+});
+
+test('scaffold generates a PHP 8.5 workflow for a PHP 8.5 plugin', async () => {
+  const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-php-85-'));
+  await writeFile(path.join(scratch, 'plugin.php'), `<?php
+/**
+ * Plugin Name: PHP 8.5 Fixture
+ * Requires PHP: 8.5
+ * Requires at least: 7.0
+ */
+`);
+
+  const plan = await planScaffold(scratch);
+  const ci = plan.files.find((file) => file.path.endsWith('plugin-tests.yml')).content;
+  assert.equal(plan.inspection.ok, true);
+  assert.deepEqual(plan.inspection.matrix.php, ['8.5']);
+  assert.match(ci, /php: \['8\.5'\]/);
 });
 
 test('bootstrap loads the inspected main file rather than the text domain', async () => {

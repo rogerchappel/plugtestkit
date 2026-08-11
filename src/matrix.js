@@ -1,9 +1,10 @@
 import { compareVersions, parseVersion, uniqueSortedVersions } from './version.js';
 
-// Keep the current and previous four WordPress minors, and supported PHP
-// branches, in generated CI. Review these defaults with each minor release.
+// Keep the current and previous four WordPress minors, and every PHP branch
+// in upstream active or security support, in generated CI. Review the defaults
+// whenever WordPress or PHP publishes a minor release or changes support status.
 export const DEFAULT_WORDPRESS_VERSIONS = ['6.6', '6.7', '6.8', '6.9', '7.0'];
-export const DEFAULT_PHP_VERSIONS = ['8.1', '8.2', '8.3', '8.4'];
+export const DEFAULT_PHP_VERSIONS = ['8.1', '8.2', '8.3', '8.4', '8.5'];
 
 export function validateMatrix(metadata, options = {}) {
   const wordpress = uniqueSortedVersions(options.wordpressVersions ?? DEFAULT_WORDPRESS_VERSIONS);
