@@ -79,6 +79,18 @@ test('inspect accepts a case-insensitive Plugin Name header', async () => {
   assert.equal(payload.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), false);
 });
 
+test('inspect rejects non-comment header lookalikes', async () => {
+  const output = captureStream();
+  const code = await runCli(['inspect', 'fixtures/header-lookalike-plugin', '--json'], {
+    stdout: output.stream,
+    stderr: captureStream().stream
+  });
+  const payload = JSON.parse(output.text());
+  assert.equal(code, 1);
+  assert.equal(payload.metadata.version, null);
+  assert.equal(payload.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), true);
+});
+
 test('scaffold reports inspection errors without partial writes', async () => {
   const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-cli-'));
   const outputDir = path.join(scratch, 'output');
