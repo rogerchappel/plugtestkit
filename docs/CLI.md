@@ -2,6 +2,8 @@
 
 ## `plugtestkit inspect <plugin-dir>`
 
+Plugin headers are detected in PHP comments within the first 8 KiB of each file, matching WordPress's file-header scan boundary.
+
 Parses a local WordPress plugin directory and prints a report.
 
 Options:
