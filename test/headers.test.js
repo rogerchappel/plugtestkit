@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parsePluginHeaders, parseReadmeMetadata } from '../src/headers.js';
+import { parsePluginHeaders, parseReadmeMetadata, PLUGIN_HEADER_SCAN_BYTES } from '../src/headers.js';
 
 test('parses WordPress plugin headers from PHP comments', () => {
   const headers = parsePluginHeaders(`<?php
@@ -38,6 +38,18 @@ echo 'Plugin Name: String Lookalike';`);
 
   assert.equal(headers.name, null);
   assert.equal(headers.version, null);
+});
+
+test('scans the WordPress-compatible first 8 KiB without a line limit', () => {
+  const source = `<?php\n${'// filler\n'.repeat(80)}// Plugin Name: Late Header`;
+  assert.equal(source.split('\n').findIndex((line) => line.includes('Plugin Name')), 81);
+  assert.ok(Buffer.byteLength(source) < PLUGIN_HEADER_SCAN_BYTES);
+  assert.equal(parsePluginHeaders(source).name, 'Late Header');
+});
+
+test('ignores plugin headers beyond the first 8 KiB', () => {
+  const source = `<?php\n/* ${'x'.repeat(PLUGIN_HEADER_SCAN_BYTES)} */\n// Plugin Name: Too Late`;
+  assert.equal(parsePluginHeaders(source).name, null);
 });
 
 test('parses readme metadata fields', () => {
