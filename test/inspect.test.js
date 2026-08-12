@@ -17,6 +17,17 @@ test('flags directories without plugin headers', async () => {
   assert.equal(result.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), true);
 });
 
+test('does not discover or inspect non-comment header lookalikes', async () => {
+  const { mainFiles } = await findPluginFiles('fixtures/header-lookalike-plugin');
+  assert.deepEqual(mainFiles, []);
+
+  const result = await inspectPlugin('fixtures/header-lookalike-plugin');
+  assert.equal(result.ok, false);
+  assert.equal(result.metadata.name, 'header-lookalike-plugin');
+  assert.equal(result.metadata.version, null);
+  assert.equal(result.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), true);
+});
+
 test('discovers and inspects a plugin with a case-insensitive Plugin Name header', async () => {
   const { mainFiles } = await findPluginFiles('fixtures/mixed-case-header-plugin');
   assert.deepEqual(mainFiles, ['fixtures/mixed-case-header-plugin/mixed-case-header-plugin.php']);

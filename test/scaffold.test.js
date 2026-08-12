@@ -64,6 +64,18 @@ test('does not create output when inspection finds no plugin header', async () =
   await assert.rejects(access(output), { code: 'ENOENT' });
 });
 
+test('does not scaffold from non-comment header lookalikes', async () => {
+  const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-lookalike-'));
+  const output = path.join(scratch, 'output');
+
+  await assert.rejects(
+    writeScaffold('fixtures/header-lookalike-plugin', output),
+    (error) => error.name === 'ScaffoldInspectionError'
+      && error.message.includes('NO_PLUGIN_HEADER')
+  );
+  await assert.rejects(access(output), { code: 'ENOENT' });
+});
+
 test('does not create output when inspection finds an invalid matrix', async () => {
   const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-scaffold-'));
   const plugin = path.join(scratch, 'invalid-matrix-plugin');
