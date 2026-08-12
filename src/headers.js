@@ -1,3 +1,7 @@
+import { Buffer } from 'node:buffer';
+
+export const PLUGIN_HEADER_SCAN_BYTES = 8 * 1024;
+
 export const PLUGIN_HEADER_FIELDS = {
   name: 'Plugin Name',
   pluginUri: 'Plugin URI',
@@ -57,7 +61,10 @@ function pluginHeaderPattern(label) {
 }
 
 function pluginCommentLines(source) {
-  const lines = String(source).split(/\r?\n/).slice(0, 80);
+  const scanSource = Buffer.from(String(source), 'utf8')
+    .subarray(0, PLUGIN_HEADER_SCAN_BYTES)
+    .toString('utf8');
+  const lines = scanSource.split(/\r?\n/);
   const comments = [];
   let inBlock = false;
   let heredoc = null;

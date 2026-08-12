@@ -91,6 +91,26 @@ test('inspect rejects non-comment header lookalikes', async () => {
   assert.equal(payload.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), true);
 });
 
+test('inspect accepts a header after line 80 within the scan window', async () => {
+  const output = captureStream();
+  const code = await runCli(['inspect', 'fixtures/late-header-plugin', '--json'], {
+    stdout: output.stream,
+    stderr: captureStream().stream
+  });
+  assert.equal(code, 0);
+  assert.equal(JSON.parse(output.text()).metadata.name, 'Late Header Plugin');
+});
+
+test('inspect rejects a header beyond the scan window', async () => {
+  const output = captureStream();
+  const code = await runCli(['inspect', 'fixtures/out-of-window-plugin', '--json'], {
+    stdout: output.stream,
+    stderr: captureStream().stream
+  });
+  assert.equal(code, 1);
+  assert.equal(JSON.parse(output.text()).findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), true);
+});
+
 test('scaffold reports inspection errors without partial writes', async () => {
   const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-cli-'));
   const outputDir = path.join(scratch, 'output');

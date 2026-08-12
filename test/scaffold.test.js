@@ -76,6 +76,20 @@ test('does not scaffold from non-comment header lookalikes', async () => {
   await assert.rejects(access(output), { code: 'ENOENT' });
 });
 
+test('plans a scaffold for a header after line 80 within the scan window', async () => {
+  const plan = await planScaffold('fixtures/late-header-plugin');
+  assert.equal(plan.inspection.ok, true);
+  assert.equal(plan.inspection.metadata.name, 'Late Header Plugin');
+});
+
+test('does not scaffold from a header beyond the scan window', async () => {
+  await assert.rejects(
+    writeScaffold('fixtures/out-of-window-plugin', 'unused-output'),
+    (error) => error.name === 'ScaffoldInspectionError'
+      && error.message.includes('NO_PLUGIN_HEADER')
+  );
+});
+
 test('does not create output when inspection finds an invalid matrix', async () => {
   const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-scaffold-'));
   const plugin = path.join(scratch, 'invalid-matrix-plugin');

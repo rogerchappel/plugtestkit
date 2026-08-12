@@ -38,3 +38,19 @@ test('discovers and inspects a plugin with a case-insensitive Plugin Name header
   assert.equal(result.metadata.version, '1.2.3');
   assert.equal(result.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), false);
 });
+
+test('discovers a plugin header after line 80 when it is within the 8 KiB scan window', async () => {
+  const { mainFiles } = await findPluginFiles('fixtures/late-header-plugin');
+  assert.deepEqual(mainFiles, ['fixtures/late-header-plugin/late-header-plugin.php']);
+  const result = await inspectPlugin('fixtures/late-header-plugin');
+  assert.equal(result.ok, true);
+  assert.equal(result.metadata.name, 'Late Header Plugin');
+});
+
+test('rejects a plugin header beyond the 8 KiB scan window', async () => {
+  const { mainFiles } = await findPluginFiles('fixtures/out-of-window-plugin');
+  assert.deepEqual(mainFiles, []);
+  const result = await inspectPlugin('fixtures/out-of-window-plugin');
+  assert.equal(result.ok, false);
+  assert.equal(result.findings.some((finding) => finding.code === 'NO_PLUGIN_HEADER'), true);
+});
