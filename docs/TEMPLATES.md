@@ -14,4 +14,11 @@ The V1 scaffold writes six files:
 The generated bootstrap loads the exact plugin entry file found during
 inspection, even when its filename differs from the plugin text domain.
 
+The generated smoke-test class keeps plugin names readable while producing a
+valid PHP identifier. Punctuation and whitespace are removed at word
+boundaries, and names that would otherwise begin with a digit are prefixed
+with `Plugin` (for example, `2FA Guard` becomes
+`Plugin2FAGuardSmokeTest`). Empty or fully non-alphanumeric names fall back to
+`PluginSmokeTest`.
+
 Templates are intentionally conservative. They should get maintainers to a reviewable first test harness without hiding external setup work.
