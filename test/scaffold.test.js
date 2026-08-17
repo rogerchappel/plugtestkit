@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { access, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { planScaffold, writeScaffold } from '../src/scaffold.js';
+import { exampleTestPhp } from '../src/templates.js';
 
 test('plans expected scaffold files', async () => {
   const plan = await planScaffold('fixtures/sample-plugin');
@@ -16,6 +18,20 @@ test('plans expected scaffold files', async () => {
     'tests/PluginSmokeTest.php',
     '.github/workflows/plugin-tests.yml'
   ]);
+});
+
+test('generates a valid PHP class identifier for digit-leading plugin names', () => {
+  const php = exampleTestPhp({ name: '2FA Guard' });
+  const declaration = php.match(/class\s+([^\s]+)\s+extends/);
+
+  assert.equal(declaration?.[1], 'Plugin2FAGuardSmokeTest');
+  assert.match(declaration[1], /^[A-Za-z_][A-Za-z0-9_]*$/);
+
+  const phpVersion = spawnSync('php', ['--version'], { encoding: 'utf8' });
+  if (!phpVersion.error) {
+    const lint = spawnSync('php', ['-l'], { input: php, encoding: 'utf8' });
+    assert.equal(lint.status, 0, lint.stderr || lint.stdout);
+  }
 });
 
 test('scaffold includes matrix in GitHub Actions template', async () => {
