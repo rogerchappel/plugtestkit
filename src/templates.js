@@ -127,7 +127,8 @@ jobs:
 }
 
 function className(name) {
-  return `${String(name).replace(/[^A-Za-z0-9]+/g, ' ').trim().split(/\s+/).map((part) => part[0]?.toUpperCase() + part.slice(1)).join('') || 'Plugin'}`;
+  const readableName = String(name).replace(/[^A-Za-z0-9]+/g, ' ').trim().split(/\s+/).map((part) => part[0]?.toUpperCase() + part.slice(1)).join('') || 'Plugin';
+  return /^[A-Za-z_]/.test(readableName) ? readableName : `Plugin${readableName}`;
 }
 
 function escapeXml(value) {
