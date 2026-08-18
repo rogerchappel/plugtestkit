@@ -5,7 +5,7 @@ import { access, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { planScaffold, writeScaffold } from '../src/scaffold.js';
-import { exampleTestPhp } from '../src/templates.js';
+import { exampleTestPhp, workflowDependencyRevisions } from '../src/templates.js';
 
 test('plans expected scaffold files', async () => {
   const plan = await planScaffold('fixtures/sample-plugin');
@@ -42,6 +42,22 @@ test('scaffold includes matrix in GitHub Actions template', async () => {
   assert.match(ci, /php-version: \$\{\{ matrix\.php \}\}/);
   assert.match(ci, /WP_VERSION: \$\{\{ matrix\.wordpress \}\}/);
   assert.match(ci, /install-wp-tests\.sh/);
+});
+
+test('scaffold pins workflow dependencies to reviewed immutable revisions', async () => {
+  const plan = await planScaffold('fixtures/sample-plugin');
+  const ci = plan.files.find((file) => file.path.endsWith('plugin-tests.yml')).content;
+
+  assert.deepEqual(workflowDependencyRevisions, {
+    checkout: 'd23441a48e516b6c34aea4fa41551a30e30af803',
+    setupPhp: 'bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f',
+    wpCliScaffold: 'd1e9ac012c53f8ea44e90e2e57e516319550df38'
+  });
+  assert.match(ci, /actions\/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6/);
+  assert.match(ci, /shivammathur\/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f # 2\.35\.5/);
+  assert.match(ci, /wp-cli\/scaffold-command\/d1e9ac012c53f8ea44e90e2e57e516319550df38\/templates\/install-wp-tests\.sh/);
+  assert.doesNotMatch(ci, /uses: [^\n]+@(v\d+|main)\b/);
+  assert.doesNotMatch(ci, /wp-cli\/scaffold-command\/(main|master)\//);
 });
 
 test('scaffold generates a PHP 8.5 workflow for a PHP 8.5 plugin', async () => {

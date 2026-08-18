@@ -22,3 +22,16 @@ with `Plugin` (for example, `2FA Guard` becomes
 `PluginSmokeTest`.
 
 Templates are intentionally conservative. They should get maintainers to a reviewable first test harness without hiding external setup work.
+
+## Updating generated workflow dependencies
+
+The generated workflow pins GitHub Actions and the WordPress test-suite installer
+to full commit revisions. The readable release labels beside action references
+are documentation only; the commit hashes are the executed references.
+
+To update a dependency, review its upstream release notes and the referenced
+change, replace the corresponding value in `workflowDependencyRevisions` in
+`src/templates.js`, and update the exact assertions in `test/scaffold.test.js`.
+Run `npm run release:check` and inspect a generated `plugin-tests.yml` before
+committing. Never replace these revisions with a mutable tag or branch such as
+`v6`, `v2`, or `main`.
