@@ -1,5 +1,11 @@
 import { slugify } from './path-utils.js';
 
+export const workflowDependencyRevisions = Object.freeze({
+  checkout: 'd23441a48e516b6c34aea4fa41551a30e30af803', // actions/checkout v6
+  setupPhp: 'bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f', // shivammathur/setup-php 2.35.5
+  wpCliScaffold: 'd1e9ac012c53f8ea44e90e2e57e516319550df38' // wp-cli/scaffold-command main, reviewed 2026-08-18
+});
+
 export function composerJson(metadata) {
   const slug = slugify(metadata.textDomain ?? metadata.name);
   return `${JSON.stringify({
@@ -107,8 +113,8 @@ jobs:
         php: [${matrix.php.map((v) => `'${v}'`).join(', ')}]
         wordpress: [${matrix.wordpress.map((v) => `'${v}'`).join(', ')}]
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@${workflowDependencyRevisions.checkout} # v6
+      - uses: shivammathur/setup-php@${workflowDependencyRevisions.setupPhp} # 2.35.5
         with:
           php-version: \${{ matrix.php }}
           tools: composer
@@ -120,7 +126,7 @@ jobs:
         run: |
           curl --fail --silent --show-error --location \
             --output /tmp/install-wp-tests.sh \
-            https://raw.githubusercontent.com/wp-cli/scaffold-command/main/templates/install-wp-tests.sh
+            https://raw.githubusercontent.com/wp-cli/scaffold-command/${workflowDependencyRevisions.wpCliScaffold}/templates/install-wp-tests.sh
           bash /tmp/install-wp-tests.sh wordpress_test root '' "127.0.0.1:\${DB_PORT}" "\${WP_VERSION}"
       - run: composer test
 `;
