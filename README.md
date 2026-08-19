@@ -154,6 +154,12 @@ The package smoke creates the npm tarball without publishing, verifies its
 package identity and required files, installs it into a temporary directory,
 and runs the installed CLI's `--help` and `--version` commands.
 
+The release workflow enforces one identity across the release tag, package,
+and artifact: a package version `X.Y.Z` must be released from tag `vX.Y.Z`,
+and `npm pack --json` must produce exactly one `plugtestkit-X.Y.Z.tgz`. The
+validated tarball path is passed directly to GitHub release creation; wildcard
+artifact selection is not used.
+
 ## Development
 
 Run the same local checks that protect the package before opening a release or pull request:
