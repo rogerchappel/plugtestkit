@@ -64,7 +64,7 @@ test('runs matrix command as focused JSON', async () => {
   const payload = JSON.parse(output.text());
   assert.equal(code, 0);
   assert.equal(payload.plugin, 'Sample Fixture Plugin');
-  assert.deepEqual(payload.php, ['8.1', '8.2', '8.3', '8.4', '8.5']);
+  assert.deepEqual(payload.php, ['8.2', '8.3', '8.4', '8.5']);
 });
 
 test('inspect accepts a case-insensitive Plugin Name header', async () => {

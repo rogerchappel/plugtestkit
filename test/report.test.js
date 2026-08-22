@@ -6,7 +6,7 @@ import { renderJsonReport, renderTextReport } from '../src/report.js';
 test('renders text reports with status and matrix', async () => {
   const report = renderTextReport(await inspectPlugin('fixtures/sample-plugin'));
   assert.match(report, /status: ok/);
-  assert.match(report, /php: 8\.1, 8\.2, 8\.3/);
+  assert.match(report, /php: 8\.2, 8\.3, 8\.4, 8\.5/);
 });
 
 test('renders parseable json reports', async () => {
