@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update generated test matrices to the currently supported PHP 8.2-8.5
+  branches while continuing to filter them by plugin metadata.
 - Correct the installation documentation to use the versioned GitHub release
   artifact while the package is not published to npm.
 - Verify package identity, contents, installation, help output, and version
