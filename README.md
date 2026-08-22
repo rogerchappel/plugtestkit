@@ -50,7 +50,7 @@ plugtestkit matrix fixtures/sample-plugin --json
 
 ### Default compatibility policy
 
-The generated matrix includes PHP 8.1 through 8.5: every branch currently in
+The generated matrix includes PHP 8.2 through 8.5: every branch currently in
 [PHP active or security support](https://www.php.net/supported-versions.php).
 When PHP publishes a minor release or changes a branch's support status, these
 defaults and their generated-workflow tests should be reviewed together.
