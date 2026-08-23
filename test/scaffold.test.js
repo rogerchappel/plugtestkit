@@ -44,6 +44,18 @@ test('scaffold includes matrix in GitHub Actions template', async () => {
   assert.match(ci, /install-wp-tests\.sh/);
 });
 
+test('scaffold runs every generated Composer quality script in CI', async () => {
+  const plan = await planScaffold('fixtures/sample-plugin');
+  const composer = JSON.parse(plan.files.find((file) => file.path === 'composer.json').content);
+  const ci = plan.files.find((file) => file.path.endsWith('plugin-tests.yml')).content;
+
+  assert.deepEqual(composer.scripts, {
+    test: 'phpunit',
+    lint: 'phpcs'
+  });
+  assert.match(ci, /- run: composer lint\n\s+- run: composer test/);
+});
+
 test('scaffold pins workflow dependencies to reviewed immutable revisions', async () => {
   const plan = await planScaffold('fixtures/sample-plugin');
   const ci = plan.files.find((file) => file.path.endsWith('plugin-tests.yml')).content;
