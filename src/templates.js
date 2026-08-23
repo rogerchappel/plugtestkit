@@ -128,6 +128,7 @@ jobs:
             --output /tmp/install-wp-tests.sh \
             https://raw.githubusercontent.com/wp-cli/scaffold-command/${workflowDependencyRevisions.wpCliScaffold}/templates/install-wp-tests.sh
           bash /tmp/install-wp-tests.sh wordpress_test root '' "127.0.0.1:\${DB_PORT}" "\${WP_VERSION}"
+      - run: composer lint
       - run: composer test
 `;
 }
