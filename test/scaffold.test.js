@@ -49,9 +49,26 @@ test('scaffold runs every generated Composer quality script in CI', async () => 
   const composer = JSON.parse(plan.files.find((file) => file.path === 'composer.json').content);
   const ci = plan.files.find((file) => file.path.endsWith('plugin-tests.yml')).content;
 
-  assert.deepEqual(composer.scripts, {
-    test: 'phpunit',
-    lint: 'phpcs'
+  assert.deepEqual(composer, {
+    name: 'local/sample-fixture',
+    description: 'A tiny fixture plugin used by plugtestkit tests and smoke checks.',
+    type: 'wordpress-plugin',
+    license: 'GPL-2.0-or-later',
+    require: {},
+    'require-dev': {
+      'phpunit/phpunit': '^9.6',
+      'wp-coding-standards/wpcs': '^3.0',
+      'dealerdirect/phpcodesniffer-composer-installer': '^1.0'
+    },
+    config: {
+      'allow-plugins': {
+        'dealerdirect/phpcodesniffer-composer-installer': true
+      }
+    },
+    scripts: {
+      test: 'phpunit',
+      lint: 'phpcs'
+    }
   });
   assert.match(ci, /- run: composer lint\n\s+- run: composer test/);
 });

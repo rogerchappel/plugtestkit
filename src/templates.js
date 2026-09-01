@@ -14,10 +14,15 @@ export function composerJson(metadata) {
     type: 'wordpress-plugin',
     license: metadata.license ?? 'GPL-2.0-or-later',
     require: {},
-    requireDev: {
+    'require-dev': {
       'phpunit/phpunit': '^9.6',
       'wp-coding-standards/wpcs': '^3.0',
       'dealerdirect/phpcodesniffer-composer-installer': '^1.0'
+    },
+    config: {
+      'allow-plugins': {
+        'dealerdirect/phpcodesniffer-composer-installer': true
+      }
     },
     scripts: {
       test: 'phpunit',
