@@ -53,6 +53,12 @@ test('scaffold runs every generated Composer quality script in CI', async () => 
     test: 'phpunit',
     lint: 'phpcs'
   });
+  assert.deepEqual(composer['require-dev'], {
+    'phpunit/phpunit': '^9.6',
+    'wp-coding-standards/wpcs': '^3.0',
+    'dealerdirect/phpcodesniffer-composer-installer': '^1.0'
+  });
+  assert.equal(composer.requireDev, undefined);
   assert.match(ci, /- run: composer lint\n\s+- run: composer test/);
 });
 
