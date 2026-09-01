@@ -35,7 +35,8 @@
     "build": "node scripts/build.js",
     "smoke": "bash scripts/smoke.sh",
     "package:smoke": "node scripts/package-smoke.js",
-    "release:check": "npm test && npm run check && npm run build && npm run smoke && npm run package:smoke"
+    "generated-harness:smoke": "bash scripts/generated-harness-smoke.sh",
+    "release:check": "npm test && npm run check && npm run build && npm run smoke && npm run package:smoke && npm run generated-harness:smoke"
   },
   "keywords": [
     "wordpress",

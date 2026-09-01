@@ -66,6 +66,12 @@ Generate a harness into an explicit directory:
 plugtestkit scaffold fixtures/sample-plugin --output out/harness
 ```
 
+Composer 2 must be available on `PATH` before installing or running the
+generated PHP quality commands. The generated `composer.json` installs
+PHPUnit and WordPress Coding Standards as development dependencies, so run
+`composer install` in the harness directory before `composer lint` or
+`composer test`.
+
 Dry-run the scaffold plan:
 
 ```sh
