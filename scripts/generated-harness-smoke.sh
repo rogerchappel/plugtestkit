@@ -16,6 +16,18 @@ npm install --ignore-scripts --no-audit --no-fund --prefix "$scratch/install" "$
 composer validate --strict --no-check-publish --working-dir "$scratch/harness"
 composer install --no-interaction --no-progress --working-dir "$scratch/harness"
 composer lint --working-dir "$scratch/harness" -- --version
-composer test --working-dir "$scratch/harness" -- --version
+
+mkdir -p "$scratch/wordpress-tests-lib/includes"
+printf '%s\n' '<?php' \
+  '$GLOBALS["plugtestkit_filters"] = [];' \
+  'function tests_add_filter($hook, $callback): void { $GLOBALS["plugtestkit_filters"][$hook][] = $callback; }' \
+  > "$scratch/wordpress-tests-lib/includes/functions.php"
+printf '%s\n' '<?php' \
+  'define("ABSPATH", __DIR__ . "/wordpress/");' \
+  'class WP_UnitTestCase extends PHPUnit\\Framework\\TestCase {}' \
+  'function do_action($hook): void { foreach ($GLOBALS["plugtestkit_filters"][$hook] ?? [] as $callback) { $callback(); } }' \
+  'do_action("muplugins_loaded");' \
+  > "$scratch/wordpress-tests-lib/includes/bootstrap.php"
+WP_TESTS_DIR="$scratch/wordpress-tests-lib" composer test --working-dir "$scratch/harness"
 
 echo "generated harness smoke passed"
