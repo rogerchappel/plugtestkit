@@ -5,13 +5,15 @@ import { bootstrapPhp, composerJson, exampleTestPhp, githubActionsCi, phpcsXml, 
 
 export async function planScaffold(pluginDir, options = {}) {
   const inspection = await inspectPlugin(pluginDir, options);
+  const mainFile = options.bootstrapMainFile
+    ?? (inspection.mainFile ? path.basename(inspection.mainFile) : `${inspection.metadata.textDomain}.php`);
   const files = [
     { path: 'composer.json', content: composerJson(inspection.metadata) },
     { path: 'phpunit.xml.dist', content: phpunitXml(inspection.metadata) },
     { path: 'phpcs.xml.dist', content: phpcsXml(inspection.metadata) },
     { path: 'tests/bootstrap.php', content: bootstrapPhp(
       inspection.metadata,
-      inspection.mainFile ? path.basename(inspection.mainFile) : `${inspection.metadata.textDomain}.php`
+      mainFile
     ) },
     { path: 'tests/PluginSmokeTest.php', content: exampleTestPhp(inspection.metadata) },
     { path: '.github/workflows/plugin-tests.yml', content: githubActionsCi(inspection.matrix) }
@@ -21,11 +23,18 @@ export async function planScaffold(pluginDir, options = {}) {
 }
 
 export async function writeScaffold(pluginDir, outputDir, options = {}) {
-  const plan = await planScaffold(pluginDir, options);
+  const cwd = options.cwd ?? process.cwd();
+  const absoluteOutput = path.resolve(cwd, outputDir);
+  const inspection = await inspectPlugin(pluginDir, options);
+  if (!inspection.ok) {
+    throw new ScaffoldInspectionError(inspection.findings);
+  }
+  const absoluteMainFile = path.resolve(cwd, inspection.mainFile);
+  const bootstrapMainFile = path.relative(absoluteOutput, absoluteMainFile).split(path.sep).join('/');
+  const plan = await planScaffold(pluginDir, { ...options, bootstrapMainFile });
   if (!plan.inspection.ok) {
     throw new ScaffoldInspectionError(plan.inspection.findings);
   }
-  const absoluteOutput = path.resolve(options.cwd ?? process.cwd(), outputDir);
   const written = [];
 
   if (!options.force) {
