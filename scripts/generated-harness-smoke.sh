@@ -24,7 +24,7 @@ printf '%s\n' '<?php' \
   > "$scratch/wordpress-tests-lib/includes/functions.php"
 printf '%s\n' '<?php' \
   'define("ABSPATH", __DIR__ . "/wordpress/");' \
-  'class WP_UnitTestCase extends PHPUnit\\Framework\\TestCase {}' \
+  'class WP_UnitTestCase extends PHPUnit\Framework\TestCase {}' \
   'function do_action($hook): void { foreach ($GLOBALS["plugtestkit_filters"][$hook] ?? [] as $callback) { $callback(); } }' \
   'do_action("muplugins_loaded");' \
   > "$scratch/wordpress-tests-lib/includes/bootstrap.php"
