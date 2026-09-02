@@ -70,7 +70,15 @@ Composer 2 must be available on `PATH` before installing or running the
 generated PHP quality commands. The generated `composer.json` installs
 PHPUnit and WordPress Coding Standards as development dependencies, so run
 `composer install` in the harness directory before `composer lint` or
-`composer test`.
+`composer test`. The bootstrap records a relative path to the inspected plugin
+entry file, so an out-of-tree harness can load that plugin without copying it.
+Keep the harness and plugin at the same relative locations after generation;
+regenerate the harness if either directory moves.
+
+GitHub only discovers workflows under the plugin repository's top-level
+`.github/workflows` directory. Treat the generated workflow as a template when
+using a separate harness directory, or generate the final harness at the
+plugin repository root before enabling it.
 
 Dry-run the scaffold plan:
 

@@ -12,7 +12,16 @@ The V1 scaffold writes six files:
 | `.github/workflows/plugin-tests.yml` | Starts MySQL, installs the WordPress test suite for each declared WordPress version, and runs PHPCS and PHPUnit across the PHP/WordPress matrix. |
 
 The generated bootstrap loads the exact plugin entry file found during
-inspection, even when its filename differs from the plugin text domain.
+inspection, even when its filename differs from the plugin text domain. When
+the output is separate from the inspected plugin, that path is relative to the
+harness root. This keeps local PHPUnit runs portable as a pair, but moving
+either directory independently requires regenerating the harness.
+
+The workflow is directly runnable only when the generated harness is placed at
+the plugin repository root, because GitHub discovers workflows only from the
+root `.github/workflows` directory and Composer commands run from the checkout
+root. For an out-of-tree harness, review and adapt the workflow template before
+installing it in the plugin repository.
 
 The generated smoke-test class keeps plugin names readable while producing a
 valid PHP identifier. Punctuation and whitespace are removed at word
