@@ -113,6 +113,19 @@ test('bootstrap loads the inspected main file rather than the text domain', asyn
   assert.doesNotMatch(bootstrap, /fancy-toolkit\.php/);
 });
 
+test('written out-of-tree scaffold loads the inspected plugin entry file', async () => {
+  const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-out-of-tree-'));
+  const pluginDir = path.resolve('fixtures/sample-plugin');
+  const output = path.join(scratch, 'harness');
+
+  await writeScaffold(pluginDir, output);
+  const bootstrap = await readFile(path.join(output, 'tests/bootstrap.php'), 'utf8');
+  const relativeMainFile = path.relative(output, path.join(pluginDir, 'sample-plugin.php')).split(path.sep).join('/');
+
+  assert.match(bootstrap, new RegExp(relativeMainFile.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.doesNotMatch(bootstrap, /dirname\(__DIR__\) \. '\/sample-plugin\.php'/);
+});
+
 test('does not create output when inspection finds no plugin header', async () => {
   const scratch = await mkdtemp(path.join(os.tmpdir(), 'plugtestkit-scaffold-'));
   const output = path.join(scratch, 'output');
