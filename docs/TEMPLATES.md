@@ -9,7 +9,7 @@ The V1 scaffold writes six files:
 | `phpcs.xml.dist` | Enables WordPress Coding Standards. |
 | `tests/bootstrap.php` | Loads the WordPress test suite and plugin file. |
 | `tests/PluginSmokeTest.php` | Provides a deliberately tiny WP_UnitTestCase starter. |
-| `.github/workflows/plugin-tests.yml` | Starts MySQL, installs the WordPress test suite for each declared WordPress version, and runs PHPCS and PHPUnit across the PHP/WordPress matrix. |
+| `.github/workflows/plugin-tests.yml` | Grants `contents: read`, starts MySQL, installs the WordPress test suite for each declared WordPress version, and runs PHPCS and PHPUnit across the PHP/WordPress matrix. |
 
 The generated bootstrap loads the exact plugin entry file found during
 inspection, even when its filename differs from the plugin text domain. When
@@ -22,6 +22,10 @@ the plugin repository root, because GitHub discovers workflows only from the
 root `.github/workflows` directory and Composer commands run from the checkout
 root. For an out-of-tree harness, review and adapt the workflow template before
 installing it in the plugin repository.
+
+The workflow declares only `contents: read` at the top level. Checkout and test
+execution need repository contents, but the generated harness does not receive
+write access to repository content or other GitHub token scopes.
 
 The generated smoke-test class keeps plugin names readable while producing a
 valid PHP identifier. Punctuation and whitespace are removed at word

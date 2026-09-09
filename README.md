@@ -104,7 +104,7 @@ console.log(inspection.ok, plan.files.map((file) => file.path));
 - `phpcs.xml.dist`.
 - `tests/bootstrap.php`.
 - `tests/PluginSmokeTest.php`.
-- `.github/workflows/plugin-tests.yml` with MySQL, PHPCS linting, and a provisioned WordPress test suite for every PHP/WordPress matrix entry.
+- `.github/workflows/plugin-tests.yml` with read-only repository access, MySQL, PHPCS linting, and a provisioned WordPress test suite for every PHP/WordPress matrix entry.
 
 ## Safety boundaries
 
