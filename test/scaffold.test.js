@@ -44,6 +44,15 @@ test('scaffold includes matrix in GitHub Actions template', async () => {
   assert.match(ci, /install-wp-tests\.sh/);
 });
 
+test('scaffold grants the generated workflow read-only repository access', async () => {
+  const plan = await planScaffold('fixtures/sample-plugin');
+  const ci = plan.files.find((file) => file.path.endsWith('plugin-tests.yml')).content;
+
+  assert.match(ci, /^permissions:\n  contents: read$/m);
+  assert.doesNotMatch(ci, /^\s{2,}[a-z-]+: write$/m);
+  assert.ok(ci.indexOf('permissions:\n') < ci.indexOf('jobs:\n'));
+});
+
 test('scaffold runs every generated Composer quality script in CI', async () => {
   const plan = await planScaffold('fixtures/sample-plugin');
   const composer = JSON.parse(plan.files.find((file) => file.path === 'composer.json').content);
